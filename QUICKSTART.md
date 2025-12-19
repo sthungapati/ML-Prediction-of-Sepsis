@@ -39,7 +39,7 @@ python main.py \
   --batch_size 16
 ```
 
-### Full Dataset (Production)
+### Full Dataset
 ```bash
 python main.py \
   --training_dir training_setA/training \
@@ -69,23 +69,4 @@ After training, you'll see:
 - Evaluation results on train/val/test sets
 - Saved model files
 - Visualization plots (ROC curve, confusion matrix, etc.)
-
-## Troubleshooting
-
-### Out of Memory
-- Reduce `batch_size`
-- Reduce `max_patients`
-- Reduce `sequence_length`
-- Reduce `lstm_units`
-
-### Slow Training
-- Enable GPU if available
-- Reduce `max_patients` for testing
-- Use `--n_workers` to control parallel processing
-
-### Poor Performance
-- Increase training data (`max_patients`)
-- Increase `sequence_length`
-- Adjust `lstm_units` and `dropout_rate`
-- Train for more `epochs`
 

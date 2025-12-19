@@ -41,52 +41,12 @@ This project implements a supervised learning model that predicts the probabilit
 pip install -r requirements.txt
 ```
 
-2. Ensure you have the training data in the following structure:
-```
-training_setA/
-  └── training/
-      ├── p000001.psv
-      ├── p000002.psv
-      └── ...
-```
-
 ## Usage
 
 ### Basic Training
 
 ```bash
 python main.py --training_dir training_setA/training
-```
-
-### Advanced Training with Custom Parameters
-
-```bash
-python main.py \
-  --training_dir training_setA/training \
-  --sequence_length 24 \
-  --prediction_horizon 6 \
-  --max_patients 10000 \
-  --batch_size 64 \
-  --epochs 100 \
-  --lstm_units 256,128,64 \
-  --dropout_rate 0.4 \
-  --learning_rate 0.0001 \
-  --n_workers 8
-```
-
-### Using Training Script Directly
-
-```python
-from train_sepsis_model import train_sepsis_model
-
-model, preprocessor, results, history = train_sepsis_model(
-    training_dir='training_setA/training',
-    sequence_length=24,
-    prediction_horizon=6,
-    max_patients=5000,
-    batch_size=32,
-    epochs=50
-)
 ```
 
 ## Model Architecture
@@ -255,25 +215,4 @@ X, _, _ = SequenceBatcher.batch_patient_sequences(
 probabilities = model.predict(X)
 print(f"Sepsis probability: {probabilities[0][0]:.4f}")
 ```
-
-## Requirements
-
-- Python 3.8+
-- TensorFlow 2.10+
-- NumPy 1.21+
-- Pandas 1.3+
-- scikit-learn 1.0+
-- matplotlib 3.5+
-- seaborn 0.11+
-
-## Notes
-
-- The model uses masking to handle variable-length sequences and missing data
-- Training time depends on dataset size and hardware (GPU recommended)
-- For large datasets, consider using `max_patients` parameter for initial testing
-- Model performance improves with more training data
-
-## License
-
-This project is for educational and research purposes.
 
