@@ -36,13 +36,21 @@ def predict_sepsis(
     """
     # Load model
     print(f"Loading model from {model_path}...")
-    # Use keras.saving.load_model for Keras v3 native format
+    # Try different loading methods based on file extension and Keras version
     try:
-        model = keras.saving.load_model(model_path)
+        # For .keras files, use keras.models.load_model (works in both TF 2.x and Keras 3.x)
+        if model_path.endswith('.keras'):
+            model = keras.models.load_model(model_path, compile=False)
+        else:
+            # For .h5 files, try standard load first
+            model = keras.models.load_model(model_path, compile=False)
     except Exception as e:
-        print(f"Standard load failed with: {e}")
-        print("Retrying with legacy loader (for older .h5 models)...")
-        model = keras.models.load_model(model_path, compile=False)
+        print(f"Model loading failed: {e}")
+        print("\nTroubleshooting:")
+        print("1. Make sure you're using the .keras format model (not .h5)")
+        print("2. If you only have .h5, you may need to retrain the model")
+        print("3. Check that TensorFlow/Keras versions are compatible")
+        raise
     
     # Load preprocessor
     print(f"Loading preprocessor from {preprocessor_path}...")
@@ -118,8 +126,8 @@ def main():
     parser.add_argument(
         '--model_path',
         type=str,
-        default='sepsis_lstm_model.h5',
-        help='Path to trained model (default: sepsis_lstm_model.h5)'
+        default=None,  # Will auto-detect
+        help='Path to trained model (default: auto-detect .keras file)'
     )
     
     parser.add_argument(
@@ -149,6 +157,20 @@ def main():
     if not Path(args.patient_file).exists():
         print(f"Error: Patient file '{args.patient_file}' not found!")
         return
+    
+    # Auto-detect model file if not specified
+    if args.model_path is None:
+        # Try .keras first (preferred), then .h5
+        if Path('sepsis_lstm_model.keras').exists():
+            args.model_path = 'sepsis_lstm_model.keras'
+            print("Auto-detected model: sepsis_lstm_model.keras")
+        elif Path('sepsis_lstm_model.h5').exists():
+            args.model_path = 'sepsis_lstm_model.h5'
+            print("Auto-detected model: sepsis_lstm_model.h5 (consider using .keras format)")
+        else:
+            print("Error: No model file found!")
+            print("Please train the model first using main.py")
+            return
     
     if not Path(args.model_path).exists():
         print(f"Error: Model file '{args.model_path}' not found!")
